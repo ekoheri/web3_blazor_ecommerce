@@ -1,0 +1,70 @@
+@page "/shoppingchart"
+
+@inject ProtectedSessionStorage ProtectedSessionStore
+@using BlazorApp.Data
+
+@{
+    int nomor = 0;
+    int jumlah = 0;
+    int total = 0;
+}
+
+<PageTitle>Shopping Chart</PageTitle>
+
+<h1>Shopping Chart</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>No</th>
+            <th>ID Buku</th>
+            <th>Judul</th>
+            <th>Harga</th>
+            <th>Jumlah</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if(listBasket != null)
+            @foreach(BookInBasket shopcrt in listBasket)
+            {
+                <tr>
+                    @{
+                        nomor += 1;
+                        jumlah = Convert.ToInt32(shopcrt.Harga_Basket.Replace(".",""))
+                            * shopcrt.Jumlah_Basket;
+                        total += jumlah;
+                    }
+                    <td>@nomor</td>
+                    <td>@shopcrt.Id_Basket</td>
+                    <td>@shopcrt.Judul_Basket</td>
+                    <td>@shopcrt.Harga_Basket</td>
+                    <td>@shopcrt.Jumlah_Basket</td>
+                    <td>@jumlah.ToString("N0")</td>
+                </tr>
+            }
+            <tr>
+                <td colspan="5">Total</td>
+                <td>@total.ToString("N0")</td>
+            </tr>
+    </tbody>
+</table>
+@if(listBasket != null)
+    @if(listBasket.Count > 0)
+    {
+        <button class="btn btn-primary">Checkout</button>
+    }
+
+@code
+{
+    private List<BookInBasket>? listBasket = new List<BookInBasket>();
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ProtectedSessionStore.GetAsync<List<BookInBasket>>("daftar_belanja");
+        if(result.Success)
+        {
+            if(result.Value != null)
+                listBasket = result.Value.ToList();
+        }
+    }
+}

@@ -1,0 +1,121 @@
+@using BlazorApp.Data
+@inject IJSRuntime JsRuntime
+@inject BooksBasket bookBasket
+@implements IDisposable
+@inject ProtectedSessionStorage ProtectedSessionStore
+
+<li class="col-xs-6 col-sm-4 col-md-3 col-lg-3">
+    <article class="product_pod">
+        <div class="image_container">
+            <a href="detailproduk/@Id">
+            <img src="@Photo" alt="A Light in the Attic" class="thumbnail"></a>
+        </div>
+        <p class="star-rating @Rating">
+            <i class="oi oi-star"></i>
+            <i class="oi oi-star"></i>
+            <i class="oi oi-star"></i>
+            <i class="oi oi-star"></i>
+            <i class="oi oi-star"></i>
+        </p>
+        <h3><a href="detailproduk/@Id" title="@Judul">@Judul</a></h3>
+        <div class="product_price">
+            <p class="price_color">@Harga</p>
+            <p>stock : @Stock</p>
+            <p>
+                <button disabled="@btnPlusMinDisabled" @onclick="Minus">-</button>
+                <input disabled="@btnPlusMinDisabled" type="text" value="@Jumlah" style="width:40px; text-align:center;" />
+                <button disabled="@btnPlusMinDisabled" @onclick="Plus">+</button>
+            </p>
+            <button class="btn @backgroundButton btn-block" @onclick="AddToBasket" style="margin-top:5px;">
+                @statusBasket
+            </button>
+        </div>
+    </article>
+</li>
+@code {
+    [Parameter]
+    public string Id {get;set;} = "";
+    [Parameter]
+    public string Photo {get; set;} = "";
+    [Parameter]
+    public string Rating {get; set;} = "";
+    [Parameter]
+    public string Judul {get; set;} = "";
+    [Parameter]
+    public string Harga {get; set;} = "";
+    [Parameter]
+    public int Stock {get; set;} = 0;
+    [Parameter]
+    public int Jumlah {get; set;} = 1;
+    [Parameter]
+    public bool InBasket {get; set;} = false;
+
+    private string statusBasket = "Add to Basket";
+    private string backgroundButton = "btn-primary";
+    private bool btnPlusMinDisabled = false;
+
+    private List<BookInBasket>? listBasket = new List<BookInBasket>();
+
+    private void Minus()
+    {
+        if(Jumlah > 1)
+            Jumlah -= 1;
+    }
+
+    private void Plus()
+    {
+        if(Jumlah < Stock)
+            Jumlah += 1;
+    }
+    private async Task AddToBasket()
+    {
+        if(statusBasket == "Add to Basket")
+        {
+            await JsRuntime.InvokeAsync<object>("alert", $"Anda memilih ID Buku : "+Id);
+            statusBasket = $"Remove from Basket";
+            backgroundButton = "btn-secondary";
+            btnPlusMinDisabled = true;
+
+            //tambahkan ke basket
+            bookBasket.AddValue(
+                new BookInBasket
+                {
+                    Id_Basket = Id,
+                    Judul_Basket = Judul,
+                    Harga_Basket = Harga,
+                    Jumlah_Basket = Jumlah,
+                    InBasket = true
+                }
+            );
+        }
+        else
+        {
+            bool oke = await JsRuntime.InvokeAsync<bool>("confirm", $"Anda akan membatalkan pembelian?");
+            if(oke == true)
+            {
+                statusBasket = $"Add to Basket";
+                backgroundButton = "btn-primary";
+                btnPlusMinDisabled = false;
+
+                //hapus dari basket
+                bookBasket.RemoveValue(Id);
+            }
+        }
+        listBasket = bookBasket.Basket;
+        await ProtectedSessionStore.SetAsync("daftar_belanja", listBasket); 
+    }
+    protected override void OnInitialized()
+    {
+        bookBasket.OnBasketChange += StateHasChanged;
+        if(InBasket == true)
+        {
+            statusBasket = $"Remove from Basket";
+            backgroundButton = "btn-secondary";
+            btnPlusMinDisabled = true;
+        }
+    }
+    public void Dispose()
+    {
+        bookBasket.OnBasketChange -= StateHasChanged;
+    }
+}

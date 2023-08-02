@@ -1,0 +1,6 @@
+[
+    {"Id":"B001", "Photo":"https://books.toscrape.com/media/cache/be/a5/bea5697f2534a2f86a3ef27b5a8c12a6.jpg", "Judul":"Judul Buku 1", "Rating":"Five", "Harga":"250.000", "Stock":5},
+    {"Id":"B002", "Photo":"https://books.toscrape.com/media/cache/68/33/68339b4c9bc034267e1da611ab3b34f8.jpg", "Judul":"Judul Buku 2", "Rating":"Three", "Harga":"150.000", "Stock":3},
+    {"Id":"B003", "Photo":"https://books.toscrape.com/media/cache/92/27/92274a95b7c251fea59a2b8a78275ab4.jpg", "Judul":"Judul Buku 3", "Rating":"Four", "Harga":"175.000", "Stock":4},
+    {"Id":"B004", "Photo":"https://books.toscrape.com/media/cache/3d/54/3d54940e57e662c4dd1f3ff00c78cc64.jpg", "Judul":"Judul Buku 4", "Rating":"Two", "Harga":"85.000", "Stock":8}
+]

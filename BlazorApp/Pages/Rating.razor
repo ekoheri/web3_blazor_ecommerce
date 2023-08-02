@@ -1,0 +1,34 @@
+@layout EmptyLayout
+@page "/rating/{id}"
+
+<PageTitle>Rating</PageTitle>
+
+<article class="product_page">
+    <div class="row">
+        <div class="alert alert-warning" role="alert">
+            <strong>Silahkan isi rating pada produk @Id ini</strong>
+        </div>
+        <div class="col-sm-12 product_main text-center">
+            <p class="star-rating">
+                <i class="oi oi-star"></i>
+                <i class="oi oi-star"></i>
+                <i class="oi oi-star"></i>
+                <i class="oi oi-star"></i>
+                <i class="oi oi-star"></i>
+            </p>
+            <p>
+                <input type="checkbox" value="1" />
+                <input type="checkbox" value="2" />
+                <input type="checkbox" value="3" />
+                <input type="checkbox" value="4" />
+                <input type="checkbox" value="5" />
+            </p>
+            <button class="btn btn-primary">Simpan</button>
+        </div>
+    </div>
+</article>
+@code
+{
+    [Parameter]
+    public string Id {get; set;} = "";
+}

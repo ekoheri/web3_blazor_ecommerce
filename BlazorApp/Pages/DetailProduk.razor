@@ -1,0 +1,79 @@
+@page "/detailproduk/{id}"
+
+<PageTitle>Detail Produk</PageTitle>
+
+@using BlazorApp.Data
+@inject IBooksService BooksService
+@inject IJSRuntime JsRuntime
+
+@if(Data?.Any() != true)
+{
+    <h1>Data @Id Tidak Ditemukan!</h1>
+}
+else
+    @foreach(BookDetail bukuDetail in Data)
+    {
+        <article class="product_page"><!-- Start of product page -->
+            <div class="row">
+                <div class="alert alert-warning" role="alert">
+                    <strong>ID Produk : @Id</strong>
+                </div>
+                <div class="col-sm-6">
+                    <div id="product_gallery" class="carousel">
+                        <div class="thumbnail">
+                            <div class="carousel-inner">
+                                <div class="item active">
+                                        <img src="@bukuDetail.Photo" alt="@bukuDetail.Judul" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 product_main">
+                    <h1>@bukuDetail.Judul</h1>
+                    <p class="price_color">@bukuDetail.Harga</p>
+                    <p class="instock availability">
+                        <i class="icon-ok"></i>
+                        In stock (@bukuDetail.Stock)
+                    </p>
+                    <p class="star-rating @bukuDetail.Rating">
+                        <i class="oi oi-star"></i>
+                        <i class="oi oi-star"></i>
+                        <i class="oi oi-star"></i>
+                        <i class="oi oi-star"></i>
+                        <i class="oi oi-star"></i>
+                    </p>
+                    <button class="btn btn-primary" @onclick="PopupRating">Rating</button>
+                    <hr/>
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Warning!</strong> This is a demo website for web scraping purposes. Prices and ratings here were randomly assigned and have no real meaning.
+                    </div>
+                </div><!-- /col-sm-6 -->
+            </div><!-- /row -->
+            <div id="product_description" class="sub-header">
+                <h2>Product Description</h2>
+            </div>
+            <p>@bukuDetail.Deskripsi</p>
+            <section>
+                <div id="reviews" class="sub-header">
+                </div>
+            </section>
+        </article><!-- End of product page -->
+    }
+
+
+@code {
+    [Parameter]
+    public string Id {get; set;} = "";
+    private IEnumerable<BookDetail> Data = Array.Empty<BookDetail>();
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Data = await BooksService.GetBookDetailAsync(Id);
+    }
+
+    private async Task PopupRating()
+    {
+        await JsRuntime.InvokeAsync<object>("buatPopup", "rating/"+Id, 600, 240);
+    }
+}

@@ -1,0 +1,11 @@
+[
+    {
+        "Id" : "B001",
+        "Photo" : "https://books.toscrape.com/media/cache/ce/5f/ce5f052c65cc963cf4422be096e915c9.jpg",
+        "Judul" : "Judul Buku 1",
+        "Deskripsi" : "Deskripsi buku yang ke satu",
+        "Rating" : "Five",
+        "Harga" : "250.000",
+        "Stock" : 10
+    }
+]

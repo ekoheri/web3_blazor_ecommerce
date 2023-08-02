@@ -1,0 +1,61 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+@inject ProtectedSessionStorage ProtectedSessionStore
+@using BlazorApp.Data
+@inject IBooksService BooksService
+
+<h1>Book Store</h1>
+
+<section>
+    <div class="alert alert-warning" role="alert">
+        <strong>Warning!</strong> This is a demo website for web scraping purposes. Prices and ratings here were randomly assigned and have no real meaning.
+    </div>
+    <div>
+        <ol class="row">
+            @foreach (Books buku in Data){
+                <ProductBooksComponent
+                    Id=@buku.Id
+                    Photo=@buku.Photo
+                    Rating=@buku.Rating
+                    Judul=@buku.Judul
+                    Harga=@buku.Harga
+                    Stock=@buku.Stock
+                    InBasket=@buku.InBasket
+                    Jumlah=@buku.Jumlah_Basket
+                >
+                </ProductBooksComponent>
+            }
+        </ol>
+    </div>
+</section>
+@code
+{
+    private IEnumerable<Books> Data = Array.Empty<Books>();
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        Data = await BooksService.GetBooksAsync();
+
+        var result = await ProtectedSessionStore.GetAsync<List<BookInBasket>>("daftar_belanja");
+        if(result.Success)
+        {
+            if(result.Value != null)
+            {
+                foreach(Books b in Data)
+                {
+                    for(int i = 0; i < result.Value.Count ; i++)
+                    {
+                        if(b.Id == result.Value[i].Id_Basket)
+                        {
+                            b.InBasket = true;
+                            b.Jumlah_Basket = result.Value[i].Jumlah_Basket;
+                            break;
+                        }//end if
+                    }//end for
+                }//end foreach
+            }//end if
+        }//end if
+    }
+}

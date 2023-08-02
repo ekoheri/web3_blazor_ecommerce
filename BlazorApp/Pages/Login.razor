@@ -1,0 +1,51 @@
+@page "/login"
+
+<PageTitle>Login User</PageTitle>
+
+@using BlazorApp.Data;
+@inject IBooksService booksService;
+@using Microsoft.AspNetCore.Mvc;
+@inject IJSRuntime JsRuntime;
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-8 col-xl-6">
+            <EditForm Model="@postData" OnSubmit="@SubmitLogin">
+                <h1 class="h3 mb-3 fw-normal">Silahkan Login</h1>
+                <div class="form-floating">
+                    <input type="email" class="form-control" id="floatingInput" 
+                    @bind-value="@postData.userName" />
+                    <label for="floatingInput">Email Anda</label>
+                </div>
+                <div class="form-floating">
+                    <input type="password" class="form-control" id="floatingPassword"
+                    @bind-value="@postData.passwd" />
+                    <label for="floatingPassword">Password</label>
+                </div>
+                <button class="w-100 btn btn-lg btn-primary" type="submit">Login</button>
+            </EditForm>
+        </div>
+    </div>
+</div>
+@code
+{
+    private PostModel postData = new PostModel();
+    private ResponseModel ? resData;
+    private async void SubmitLogin(EditContext editContext)
+    {
+        var hasil = await booksService.PostLogin(postData) ?? throw new Exception("Data NULL");
+        if(hasil != null) {
+            if(hasil.Result != null) {
+                var result = (ObjectResult)hasil.Result;
+                resData = result.Value as ResponseModel;
+                if(resData != null && resData.status==true) {
+                    //user & pass benar
+                    await JsRuntime.InvokeVoidAsync("alert", "Login sukses. Token anda "+resData.token);
+                } else {
+                    //user atau pass salah
+                    await JsRuntime.InvokeVoidAsync("alert", "Login GAGAL!!!");
+                }
+            }
+        }
+    }
+}

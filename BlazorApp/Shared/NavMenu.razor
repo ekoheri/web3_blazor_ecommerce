@@ -1,0 +1,70 @@
+﻿@using BlazorApp.Data
+@inject BooksBasket bookBasket
+@implements IDisposable
+@inject ProtectedSessionStorage ProtectedSessionStore
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">BlazorApp</a>
+        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="shoppingchart">
+                <span class="oi oi-plus" aria-hidden="true"></span> Shopping Cart
+                &nbsp;
+                <span class="badge text-bg-danger bg-danger rounded-pill">
+                    @bookBasket.Basket.Count
+                </span>
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="counter">
+                <span class="oi oi-plus" aria-hidden="true"></span> Counter
+            </NavLink>
+        </div>
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="fetchdata">
+                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
+            </NavLink>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ProtectedSessionStore.GetAsync<List<BookInBasket>>("daftar_belanja");
+        if(result.Success)
+        {
+            if(result.Value != null)
+            {
+                bookBasket.Basket = result.Value.ToList();
+            }
+        }//end if
+        bookBasket.OnBasketChange += StateHasChanged;
+    }
+    public void Dispose()
+    {
+        bookBasket.OnBasketChange -= StateHasChanged;
+    }
+}
